@@ -1,7 +1,7 @@
 # Личный проект «Дела в Порядке»
 
 * Студент: [Karolis Balza](https://up.htmlacademy.ru/php/5/user/66586).
-* Наставник: Михаил Куприянов.
+* Наставник: Михаил Куприянов https://htmlacademy.ru/profile/id541075
 
 ---
 
