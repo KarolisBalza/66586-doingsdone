@@ -140,7 +140,7 @@ $firstItem = $projectsTypes[0];
                             <td class="task__date"><?= $item["date"]?></td>
                         </tr>
                     <?php endforeach;?>
-                </table>
+                </table> 
             </main>
         </div>
     </div>
