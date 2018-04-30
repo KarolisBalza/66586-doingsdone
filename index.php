@@ -5,45 +5,43 @@ $show_complete_tasks = rand(0, 1);
 $projectsTypes = ["Все", "Входящие", "Учеба", "Работа", "Домашние дела", "Авто"];
 
 $tasksData = [
-  0 => [
+  [
         "name" => "Собеседование в IT компании",
         "date" => "01.06.2018",
         "projectType" => $projectsTypes[3],
         "isDone" => false
   ],
-  1 => [
+  [
         "name" => "Выполнить тестовое задание",
         "date" => "25.05.2018",
         "projectType" => $projectsTypes[3],
         "isDone" => false
   ],
-   2 => [
+  [
         "name" => "Сделать задание первого раздела",
         "date" => "21.04.2018",
         "projectType" => $projectsTypes[2],
         "isDone" => true
-   ],
-   3 => [
+  ],
+  [
         "name" => "Встреча с другом",
         "date" => "22.04.2018",
         "projectType" => $projectsTypes[1],
         "isDone" => false
-   ],
-   4 => [
+  ],
+  [
         "name" => "Купить корм для кота",
         "date" => "",
         "projectType" => $projectsTypes[4],
         "isDone" => false
-   ],
-   5 => [
+  ],
+  [
         "name" => "Заказать пиццу",
         "date" => "",
         "projectType" => $projectsTypes[4],
         "isDone" => false
-   ],
+  ],
 ];
-
-$firstItem = $projectsTypes[0];
 
 ?>
 <!DOCTYPE html>
@@ -91,8 +89,8 @@ $firstItem = $projectsTypes[0];
 
                 <nav class="main-navigation">
                     <ul class="main-navigation__list">
-                        <?php foreach ($projectsTypes as $item): ?>
-                                <li class="main-navigation__list-item <?= $item == $firstItem ? "main-navigation__list-item--active" : "" ?>">
+                        <?php foreach ($projectsTypes as $key => $item): ?>
+                                <li class="main-navigation__list-item <?= $key == 0 ? "main-navigation__list-item--active" : "" ?>">
                                     <a class="main-navigation__list-item-link" href="#"><?=$item;?></a>
                                     <span class="main-navigation__list-item-count">24</span>
                                 </li>
@@ -130,6 +128,7 @@ $firstItem = $projectsTypes[0];
 
                 <table class="tasks">
                     <?php foreach ($tasksData as $key => $item):?>
+                        <?php if ($show_complete_tasks == 1): ?>
                         <tr class="tasks__item task <?= $item["isDone"] == true ? "task--completed" : ""?>">
                             <td class="task__select">
                                 <label class="checkbox task__checkbox">
@@ -139,6 +138,19 @@ $firstItem = $projectsTypes[0];
                             </td>
                             <td class="task__date"><?= $item["date"]?></td>
                         </tr>
+                        <?php else: ?>
+                            <?php if ($item["isDone"] == false): ?>
+                            <tr class="tasks__item task <?= $item["isDone"] == true ? "task--completed" : ""?>">
+                                <td class="task__select">
+                                    <label class="checkbox task__checkbox">
+                                        <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?= $item["isDone"] == true ? "checked" : "" ?>>
+                                        <span class="checkbox__text"><?= $item["name"]; ?></span>
+                                    </label>
+                                </td>
+                                <td class="task__date"><?= $item["date"]?></td>
+                            </tr>
+                            <?php endif; ?>
+                        <?php endif; ?>
                     <?php endforeach;?>
                 </table>
             </main>
