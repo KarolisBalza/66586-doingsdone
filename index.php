@@ -43,6 +43,19 @@ $tasksData = [
   ],
 ];
 
+function getProjectsCount ($array, $projectsName) {
+    $projectsCount = 0;
+    if($projectsName == "Все") {
+        return count($array);
+    }
+    foreach ($array as $key => $item) {
+        if($projectsName == $item["projectType"]){
+            $projectsCount++;
+        }
+    }
+    return $projectsCount;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -92,7 +105,7 @@ $tasksData = [
                         <?php foreach ($projectsTypes as $key => $item): ?>
                                 <li class="main-navigation__list-item <?= $key == 0 ? "main-navigation__list-item--active" : "" ?>">
                                     <a class="main-navigation__list-item-link" href="#"><?=$item;?></a>
-                                    <span class="main-navigation__list-item-count">24</span>
+                                    <span class="main-navigation__list-item-count"><?= getProjectsCount($tasksData, $item) ?></span>
                                 </li>
                         <?php endforeach; ?>
                     </ul>
