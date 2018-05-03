@@ -1,5 +1,5 @@
 <?php
-require_once ("functions.php");
+require_once "functions.php";
 
 $show_complete_tasks = rand(0, 1);
 
@@ -45,11 +45,11 @@ $tasksData = [
 ];
 
 
-$pageContent = includeLayout("templates\index.php", [
+$pageContent = includeLayout("templates" . DIRECTORY_SEPARATOR . "index.php", [
     "show_complete_tasks" => $show_complete_tasks,
     "tasksData" => $tasksData ]);
 
-$layoutContent = includeLayout("templates\layout.php", [
+$layoutContent = includeLayout("templates" . DIRECTORY_SEPARATOR ."layout.php", [
     "title" => "Дела в Порядке",
     "projectsTypes" => $projectsTypes,
     "tasksData" => $tasksData,

@@ -16,11 +16,11 @@ function getProjectsCount ($array, $projectsName) {
 
 function includeLayout ($file, $data) {
     if (!file_exists($file)) {
-        return '';
+        return "";
     }
     extract($data);
     ob_start();
-    require_once($file);
+    require_once "$file";
     $content = ob_get_contents();
     ob_get_clean();
 
