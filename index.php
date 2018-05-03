@@ -44,22 +44,19 @@ $tasksData = [
   ],
 ];
 
-function getProjectsCount ($array, $projectsName) {
-    $projectsCount = 0;
-    if($projectsName == "Все") {
-        return count($array);
-    }
-    foreach ($array as $key => $item) {
-        if($projectsName == $item["projectType"]){
-            $projectsCount++;
-        }
-    }
-    return $projectsCount;
-}
 
-$pageContent = includeLayout("templates\layout.php", $projectsTypes, $tasksData);
+$pageContent = includeLayout("templates\index.php", [
+    "show_complete_tasks" => $show_complete_tasks,
+    "tasksData" => $tasksData ]);
+
+$layoutContent = includeLayout("templates\layout.php", [
+    "title" => "Дела в Порядке",
+    "projectsTypes" => $projectsTypes,
+    "tasksData" => $tasksData,
+    "pageContent" => $pageContent]);
 
 
-print ("$pageContent");
+
+print ($layoutContent);
 
 

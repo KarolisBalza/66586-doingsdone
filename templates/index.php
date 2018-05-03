@@ -29,10 +29,10 @@
                     <td class="task__select">
                         <label class="checkbox task__checkbox">
                             <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?= $item["isDone"] == true ? "checked" : "" ?>>
-                            <span class="checkbox__text"><?= $item["name"]; ?></span>
+                            <span class="checkbox__text"><?= htmlspecialchars($item["name"]); ?></span>
                         </label>
                     </td>
-                    <td class="task__date"><?= $item["date"]?></td>
+                    <td class="task__date"><?= htmlspecialchars($item["date"]);?></td>
                 </tr>
             <?php else: ?>
                 <?php if ($item["isDone"] == false): ?>
@@ -40,10 +40,10 @@
                         <td class="task__select">
                             <label class="checkbox task__checkbox">
                                 <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?= $item["isDone"] == true ? "checked" : "" ?>>
-                                <span class="checkbox__text"><?= $item["name"]; ?></span>
+                                <span class="checkbox__text"><?= htmlspecialchars($item["name"]);?></span>
                             </label>
                         </td>
-                        <td class="task__date"><?= $item["date"]?></td>
+                        <td class="task__date"><?= htmlspecialchars($item["date"]);?></td>
                     </tr>
                 <?php endif; ?>
             <?php endif; ?>

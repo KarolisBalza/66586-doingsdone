@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title><?=$pageName?></title>
+    <title><?=$title?></title>
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/flatpickr.min.css">
@@ -57,7 +57,7 @@
             </section>
 
             <main class="content__main">
-                <? print (includeLayout("templates\index.php", $projectsTypes, $tasksData)) ?>
+                <?= $pageContent ?>
             </main>
         </div>
     </div>
