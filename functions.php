@@ -26,3 +26,9 @@ function includeLayout ($file, $data) {
 
     return $content;
 };
+
+function checkTimeLeft ($date) {
+    $currentDate = strtotime(date("d.m.Y"));
+    $hoursLeft = (strtotime($date) - $currentDate) / 3600;
+    return $hoursLeft;
+}
