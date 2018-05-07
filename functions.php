@@ -1,6 +1,6 @@
 <?php
 
-
+// считает количество проектов по категориям
 function getProjectsCount ($array, $projectsName) {
     $projectsCount = 0;
     if($projectsName == "Все") {
@@ -14,6 +14,7 @@ function getProjectsCount ($array, $projectsName) {
     return $projectsCount;
 }
 
+// добовляет шаблон
 function includeLayout ($file, $data) {
     if (!file_exists($file)) {
         return "";
@@ -27,6 +28,7 @@ function includeLayout ($file, $data) {
     return $content;
 };
 
+// считает сколько часов осталось до дедлайна
 function checkTimeLeft ($date) {
     $currentDate = strtotime(date("d.m.Y"));
     $hoursLeft = (strtotime($date) - $currentDate) / 3600;
