@@ -4,10 +4,20 @@ CREATE DATABASE doingsdone
 
 USE doingsdone;
 
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name CHAR(64),
+  email CHAR(128) UNIQUE,
+  password CHAR(64),
+  regDate DATETIME,
+  contacts CHAR(128)
+);
+
 CREATE TABLE projects (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title CHAR(128),
-  users_id INT
+  users_id INT,
+  FOREIGN KEY (users_id) REFERENCES users(id)
 );
 
 CREATE TABLE tasks (
@@ -18,14 +28,12 @@ CREATE TABLE tasks (
   file CHAR(128),
   deadline DATETIME,
   users_id INT,
-  projects_id INT
+  projects_id INT,
+  FOREIGN KEY (users_id) REFERENCES users(id),
+  FOREIGN KEY (projects_id) REFERENCES projects(id)
 );
 
-CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name CHAR(64),
-  email CHAR(128),
-  password CHAR(64),
-  regDate DATETIME,
-  contacts CHAR(128)
-);
+CREATE INDEX name ON users(name);
+CREATE INDEX password ON users(password);
+
+
