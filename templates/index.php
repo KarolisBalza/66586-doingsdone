@@ -23,8 +23,8 @@
     </div>
 
     <table class="tasks">
-        <?php foreach ($tasksData as $key => $item):?>
             <?php if ($show_complete_tasks == 1): ?>
+                <?php foreach ($tasksData as $key => $item):?>
                 <tr class="tasks__item task <?= $item["isDone"] == true ? "task--completed" : ""?> <?= checkTimeLeft($item["date"]) <= 24 ? "task--important" : "" ?>" >
                     <td class="task__select">
                         <label class="checkbox task__checkbox">
@@ -34,7 +34,9 @@
                     </td>
                     <td class="task__date"><?= htmlspecialchars($item["date"]);?></td>
                 </tr>
+                <?php endforeach ?>
             <?php else: ?>
+                <?php foreach ($tasksData as $key => $item):?>
                 <?php if ($item["isDone"] == false): ?>
                     <tr class="tasks__item task <?= $item["isDone"] == true ? "task--completed" : ""?> <?= checkTimeLeft($item["date"]) <= 24 ? "task--important" : "" ?>">
                         <td class="task__select">
@@ -46,6 +48,6 @@
                         <td class="task__date"><?= htmlspecialchars($item["date"]);?></td>
                     </tr>
                 <?php endif; ?>
-            <?php endif; ?>
-        <?php endforeach;?>
+                <?php endforeach;?>
+            <? endif; ?>
     </table>
