@@ -1,35 +1,30 @@
 USE doingsdone;
 
-INSERT INTO users
-SET name = "Вася", email = "vasia@gmail.com", password = "1111";
-INSERT INTO users
-SET name = "Катя", email = "katia@gmail.com", password = "2222";
+INSERT INTO users(name, email, password)
+    VALUES
+        ("Игнат", "ignat.v@gmail.com", "$2y$10$OqvsKHQwr0Wk6FMZDoHo1uHoXd4UdxJG/5UDtUiie00XaxMHrW8ka"),
+        ("Леночка", "kitty_93@li.ru", "$2y$10$bWtSjUhwgggtxrnJ7rxmIe63ABubHQs0AS0hgnOo41IEdMHkYoSVa"),
+        ("Руслан", "warrior07@mail.ru", "$2y$10$2OxpEH7narYpkOT1H5cApezuzh10tZEEQ2axgFOaKW.55LxIJBgWW");
 
-INSERT INTO projects
-SET title = "Все", users_id = 1;
-INSERT INTO projects
-SET title = "Входящие", users_id = 1;
-INSERT INTO projects
-SET title = "Учеба", users_id = 1;
-INSERT INTO projects
-SET title = "Работа", users_id = 2;
-INSERT INTO projects
-SET title = "Домашние дела", users_id = 2;
-INSERT INTO projects
-SET title = "Авто", users_id = 2;
 
-INSERT INTO tasks
-SET title = "Собеседование в IT компании", deadline = STR_TO_DATE("01-06-2018", "%d-%m-%Y"), projects_id = 4, users_id = 1;
-INSERT INTO tasks
-SET title = "Выполнить тестовое задание", deadline = STR_TO_DATE("25-05-2018", "%d-%m-%Y"), projects_id = 4, users_id = 1;
-INSERT INTO tasks
-SET title = "Сделать задание первого раздела", deadline = STR_TO_DATE("21-04-2018", "%d-%m-%Y"), projects_id = 3, users_id = 1;
-INSERT INTO tasks
-SET title = "Встреча с другом", deadline = STR_TO_DATE("22-04-2018", "%d-%m-%Y"), projects_id = 2, users_id = 2;
-INSERT INTO tasks
-SET title = "Купить корм для кота", projects_id = 5, users_id = 2;
-INSERT INTO tasks
-SET title = "Заказать пиццу", projects_id = 5, users_id = 2;
+INSERT INTO projects (title, users_id)
+    VALUES
+        ("Входящие", 1),
+        ("Учеба", 1),
+        ("Работа", 1),
+        ("Домашние дела", 3),
+        ("Авто", 2);
+
+
+INSERT INTO tasks (title, deadline, projects_id, users_id)
+    VALUES
+        ("Собеседование в IT компании", STR_TO_DATE("2018-06-01", "%Y-%m-%d"), 4, 1),
+        ("Выполнить тестовое задание", STR_TO_DATE("2018-05-25", "%Y-%m-%d"), 4, 1),
+        ("Сделать задание первого раздела", STR_TO_DATE("2018-04-21", "%Y-%m-%d"), 3, 1),
+        ("Встреча с другом", STR_TO_DATE("2018-04-22", "%Y-%m-%d"), 2, 2),
+        ("Купить корм для кота", NULL , 5, 3),
+        ("Заказать пиццу", NULL, 5, 3);
+
 
 /*получить список из всех проектов для одного пользователя*/
 SELECT * FROM projects
@@ -45,7 +40,7 @@ WHERE id = 5;
 
 /*получить все задачи для завтрашнего дня*/
 SELECT deadline FROM tasks
-WHERE DAYOFMONTH(NOW()) + 1 = DAYOFMONTH(deadline);
+WHERE STR_TO_DATE(CURDATE() + INTERVAL 1 DAY, "%Y-%m-%d");
 
 /*обновить название задачи по её идентификатору*/
 UPDATE tasks SET title = "новое название"
