@@ -25,27 +25,27 @@
     <table class="tasks">
             <?php if ($show_complete_tasks == 1): ?>
                 <?php foreach ($tasksData as $key => $item):?>
-                <tr class="tasks__item task <?= $item["isDone"] == true ? "task--completed" : ""?> <?= checkTimeLeft($item["date"]) <= 24 ? "task--important" : "" ?>" >
+                <tr class="tasks__item task <?= $item["isDone"] == true ? "task--completed" : ""?> <?= checkTimeLeft($item["deadline"]) <= 24 ? "task--important" : "" ?>" >
                     <td class="task__select">
                         <label class="checkbox task__checkbox">
                             <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?= $item["isDone"] == true ? "checked" : "" ?>>
-                            <span class="checkbox__text"><?= htmlspecialchars($item["name"]); ?></span>
+                            <span class="checkbox__text"><?= htmlspecialchars($item["title"]); ?></span>
                         </label>
                     </td>
-                    <td class="task__date"><?= htmlspecialchars($item["date"]);?></td>
+                    <td class="task__date"><?= htmlspecialchars($item["deadline"]);?></td>
                 </tr>
                 <?php endforeach ?>
             <?php else: ?>
                 <?php foreach ($tasksData as $key => $item):?>
                 <?php if ($item["isDone"] == false): ?>
-                    <tr class="tasks__item task <?= $item["isDone"] == true ? "task--completed" : ""?> <?= checkTimeLeft($item["date"]) <= 24 ? "task--important" : "" ?>">
+                    <tr class="tasks__item task <?= $item["isDone"] == true ? "task--completed" : ""?> <?= checkTimeLeft($item["deadline"]) <= 24 ? "task--important" : "" ?>">
                         <td class="task__select">
                             <label class="checkbox task__checkbox">
                                 <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?= $item["isDone"] == true ? "checked" : "" ?>>
-                                <span class="checkbox__text"><?= htmlspecialchars($item["name"]);?></span>
+                                <span class="checkbox__text"><?= htmlspecialchars($item["title"]);?></span>
                             </label>
                         </td>
-                        <td class="task__date"><?= htmlspecialchars($item["date"]);?></td>
+                        <td class="task__date"><?= htmlspecialchars($item["deadline"]);?></td>
                     </tr>
                 <?php endif; ?>
                 <?php endforeach;?>

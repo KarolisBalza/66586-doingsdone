@@ -45,10 +45,11 @@
                     <ul class="main-navigation__list">
                         <?php foreach ($projectsTypes as $key => $item): ?>
                                 <li class="main-navigation__list-item <?= $key == 0 ? "main-navigation__list-item--active" : "" ?>">
-                                    <a class="main-navigation__list-item-link" href="#"><?=$item;?></a>
+                                    <a class="main-navigation__list-item-link" href="#"><?=$item["title"];?></a>
                                     <span class="main-navigation__list-item-count"><?= getProjectsCount($tasksData, $item) ?></span>
                                 </li>
                         <?php endforeach; ?>
+
                     </ul>
                 </nav>
 
