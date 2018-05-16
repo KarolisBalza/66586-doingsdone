@@ -34,3 +34,29 @@ function checkTimeLeft ($date) {
     $hoursLeft = (strtotime($date) - $currentDate) / 3600;
     return $hoursLeft;
 }
+
+function getProjectsTypes($link, $user) {
+    $sql = "SELECT title FROM projects WHERE users_id = $user";
+    $result = mysqli_query($link, $sql);
+
+    if($result) {
+        $projectsTypes = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $projectsTypes;
+    }
+    else {
+        exit(mysqli_error($link));
+    }
+}
+
+function getTasksData ($link, $user) {
+    $sql = "SELECT * FROM tasks WHERE users_id = $user";
+    $result = mysqli_query($link, $sql);
+
+    if($result) {
+        $tasksData = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $tasksData;
+    }
+    else {
+        exit(mysqli_error($link));
+    }
+}

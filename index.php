@@ -1,34 +1,18 @@
 <?php
 require_once "functions.php";
-require "data.php";
 
-$con = mysqli_connect("localhost", "root", "", "doingsdone");
+$userId = 1;
 
-if(!$con) {
-    print(mysqli_connect_error());
+$link = mysqli_connect("localhost", "root", "", "doingsdone");
+mysqli_set_charset($link, "utf8");
+
+if(!$link) {
+    exit(mysqli_connect_error());
 }
 else {
-    $sql = "SELECT title FROM projects WHERE users_id = 1";
-    $result = mysqli_query($con, $sql);
-
-    if($result) {
-        $projectsTypes = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    }
-    else {
-        print(mysqli_error($con));
-    }
-
-    $sql = "SELECT * FROM tasks WHERE projects_id = 4";
-    $result = mysqli_query($con, $sql);
-
-    if($result) {
-        $tasksData = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    }
-    else {
-        print(mysqli_errno($con));
-    }
+    $projectsTypes = getProjectsTypes($link, $userId);
+    $tasksData = getTasksData($link, $userId);
 }
-
 
 
 $pageContent = includeLayout(
