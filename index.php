@@ -1,8 +1,6 @@
 <?php
 require_once "functions.php";
 
-$userId = 1;
-
 $link = mysqli_connect("localhost", "root", "", "doingsdone");
 mysqli_set_charset($link, "utf8");
 
@@ -10,8 +8,14 @@ if(!$link) {
     exit(mysqli_connect_error());
 }
 else {
-    $projectsTypes = getProjectsTypes($link, $userId);
-    $tasksData = getTasksData($link, $userId);
+    if (isset($_GET["id"])) {
+        $id = (int) $_GET["id"];
+        $tasksData = getTasksDataById($link, $id);
+    }
+    else {
+        $tasksData = getTasksData($link);
+    }
+    $projectsTypes = getProjectsTypes($link);
 }
 
 
