@@ -15,11 +15,8 @@ else {
     array_unshift($projectsTypes, ["id" => 0, "title" => "Входяшие"]);
     if (isset($_GET["id"])) {
         $projectsId = (int) $_GET["id"];
-        $tasksData = getTasksDataById($link, $projectsId, $usersId);
     }
-    else {
-        $tasksData = getTasksDataById($link, $projectsId, $usersId);
-    }
+    $tasksData = getTasksDataById($link, $projectsId, $usersId);
 }
 
 
