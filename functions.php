@@ -97,31 +97,6 @@ function getTasksDataById($link, $projectsId, $usersId) {
 }
 
 /**
- * Получает данные всех задач для конкретного пользователя
- *
- * @param mysqli $link Ресурс соединения
- * @param int $usersId ID пользователя
- *
- * @return array данные задач для конкретного пользователя
- */
-
-function getTasksData ($link, $usersId) {
-    $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE users_id = ?";
-    $stmt = mysqli_prepare($link, $sql);
-    mysqli_stmt_bind_param($stmt, "i", $usersId);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-
-    if($result) {
-        $tasksData = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        return $tasksData;
-    }
-    else {
-        return [];
-    }
-}
-
-/**
  * Получает проекты для конкретного пользователя
  *
  * @param mysqli $link Ресурс соединения

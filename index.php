@@ -18,7 +18,7 @@ else {
         $tasksData = getTasksDataById($link, $projectsId, $usersId);
     }
     else {
-        $tasksData = getTasksData($link, $usersId);
+        $tasksData = getTasksDataById($link, $projectsId, $usersId);
     }
 }
 
