@@ -32,6 +32,11 @@
                             <span class="checkbox__text"><?= htmlspecialchars($item["title"]); ?></span>
                         </label>
                     </td>
+                    <td class="task__file">
+                        <?php if(!empty($item["file"])): ?>
+                        <a class="download-link" href="<?= $item["file"]?>">File</a>
+                        <? endif; ?>
+                    </td>
                     <td class="task__date"><?= htmlspecialchars($item["deadline"]);?></td>
                 </tr>
                 <?php endforeach ?>
@@ -44,6 +49,11 @@
                                 <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?= $item["isDone"] == true ? "checked" : "" ?>>
                                 <span class="checkbox__text"><?= htmlspecialchars($item["title"]);?></span>
                             </label>
+                        </td>
+                        <td class="task__file">
+                            <?php if(!empty($item["file"])): ?>
+                                <a class="download-link" href="<?= $item["file"]?>">File</a>
+                            <? endif; ?>
                         </td>
                         <td class="task__date"><?= htmlspecialchars($item["deadline"]);?></td>
                     </tr>

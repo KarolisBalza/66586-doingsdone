@@ -3,60 +3,65 @@ require_once "functions.php";
 
 $usersId = 1;
 $projectsId = 0;
-$titleError = false;
-$dateError = false;
-$errors = false;
+$errors =
+    [
+        "titleError" => false,
+        "dateError" => false,
+        "errors" => false
+    ];
 
 $link = mysqli_connect("localhost", "root", "", "doingsdone");
 mysqli_set_charset($link, "utf8");
 
-if(!$link) {
+
+if (!$link) {
     exit(mysqli_connect_error());
-}
-else {
+} else {
     $projectsTypes = getProjectsTypes($link, $usersId);
     array_unshift($projectsTypes, ["id" => 0, "title" => "Входяшие"]);
     if (isset($_GET["id"])) {
-        $projectsId = (int) $_GET["id"];
+        $projectsId = (int)$_GET["id"];
     }
     $tasksData = getTasksDataById($link, $projectsId, $usersId);
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" AND $_POST["tasks_add"] = "Добавить") {
     $postedName = $_POST["name"];
     $postedDate = $_POST["date"];
     $postedFile = $_POST["preview"];
-    if (empty($postedName)){
-        $titleError = true;
-        $errors = true;
+    $postedProject = $_POST["project"];
+    if (empty($postedName)) {
+        $errors["titleError"] = true;
+        $errors["errors"] = true;
     }
-    if(!empty($postedDate)){
-        $d = DateTime::createFromFormat('Y-m-d H:i', $postedDate);
-        if(!($d && $d->format('Y-m-d H:i') == $postedDate)) {
-            $dateError = true;
-            $errors = true;
-        }
+    if (empty($postedProject)) {
+        $postedProject = NULL;
     }
-    if(empty($postedDate)) {
+    if (!checkDatesValidity($postedDate)) {
+        $errors["dateError"] = true;
+        $errors["errors"] = true;
+    }
+    if (empty($postedDate)) {
         $postedDate = NULL;
     }
-    if(!empty($postedFile)) {
-        $fileName = $postedFile;
-        $filePath = __DIR__. "/uploads/";
-        $fileUrl = '/uploads/' . $fileName;
-        move_uploaded_file($_FILES['preview']['tmp_name'], $filePath . $fileName);
-        $file = ("<a href='$fileUrl'>$fileName</a>");
-    }
-    if(!$errors) {
-        $sql = "INSERT INTO tasks (title, file, projects_id, deadline, users_id) VALUES (?, ?, NULL , ?, ?)";
+
+    if (!$errors["errors"]) {
+        if (!empty($_FILES["preview"]["name"])) {
+            $fileUrl = uploadFile($_FILES);
+        }
+        $sql = "INSERT INTO tasks (title, file, projects_id, deadline, users_id) VALUES (?, ?, ? , ?, ?)";
         $stmt = mysqli_prepare($link, $sql);
-        mysqli_stmt_bind_param($stmt, "sssi", $postedName, $file, $postedDate, $usersId);
+        mysqli_stmt_bind_param($stmt, "ssisi", $postedName, $fileUrl, $postedProject, $postedDate, $usersId);
         $res = mysqli_stmt_execute($stmt);
-        var_dump($postedDate);
-        var_dump($res);
+        if ($res) {
+            if ($postedProject == NULL) {
+                header("Location: " . "http://66586-doingsdone/index.php?id=0");
+            } else {
+                header("Location: " . "http://66586-doingsdone/index.php?id=" . $postedProject);
+            }
+        }
     }
 }
-
 
 $pageContent = includeLayout(
     "templates" . DIRECTORY_SEPARATOR . "index.php",
@@ -69,8 +74,7 @@ $pageContent = includeLayout(
 $addTask = includeLayout(
     "templates" . DIRECTORY_SEPARATOR . "addtask.php",
     [
-        "titleError" => $titleError,
-        "dateError" => $dateError,
+        "projectsTypes" => $projectsTypes,
         "errors" => $errors,
         "postedName" => $postedName
     ]
@@ -78,7 +82,7 @@ $addTask = includeLayout(
 
 
 $layoutContent = includeLayout(
-    "templates" . DIRECTORY_SEPARATOR ."layout.php",
+    "templates" . DIRECTORY_SEPARATOR . "layout.php",
     [
         "title" => "Дела в Порядке",
         "projectsTypes" => $projectsTypes,

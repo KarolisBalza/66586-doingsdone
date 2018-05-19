@@ -120,3 +120,18 @@ function getProjectsTypes($link, $usersId) {
     }
 }
 
+function checkDatesValidity($date) {
+    $d = DateTime::createFromFormat('Y-m-d H:i', $date);
+    if (($d && $d->format('Y-m-d H:i') == $date) OR empty($date)) {
+        return true;
+    }
+}
+
+function uploadFile($file) {
+    $fileName = str_replace(' ', '-', $file['preview']['name']);
+    $fileName = preg_replace('/[^A-Za-z0-9.\-]/', '', $file['preview']['name']);
+    $fileUrl = '/uploads/' . $fileName;
+    move_uploaded_file($file['preview']['tmp_name'], "uploads/" . $fileName );
+    return $fileUrl;
+}
+
