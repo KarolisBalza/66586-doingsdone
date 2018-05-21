@@ -25,10 +25,10 @@
     <table class="tasks">
             <?php if ($show_complete_tasks == 1): ?>
                 <?php foreach ($tasksData as $key => $item):?>
-                <tr class="tasks__item task <?= $item["isDone"] == true ? "task--completed" : ""?> <?= checkTimeLeft($item["deadline"]) <= 24 ? "task--important" : "" ?>" >
+                <tr class="tasks__item task <?= $item["doneDate"] == !NULL ? "task--completed" : ""?> <?= checkTimeLeft($item["deadline"]) <= 24 ? "task--important" : "" ?>" >
                     <td class="task__select">
                         <label class="checkbox task__checkbox">
-                            <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?= $item["isDone"] == true ? "checked" : "" ?>>
+                            <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?= $item["doneDate"] == !NULL ? "checked" : "" ?>>
                             <span class="checkbox__text"><?= htmlspecialchars($item["title"]); ?></span>
                         </label>
                     </td>
@@ -42,11 +42,11 @@
                 <?php endforeach ?>
             <?php else: ?>
                 <?php foreach ($tasksData as $key => $item):?>
-                <?php if ($item["isDone"] == false): ?>
-                    <tr class="tasks__item task <?= $item["isDone"] == true ? "task--completed" : ""?> <?= checkTimeLeft($item["deadline"]) <= 24 ? "task--important" : "" ?>">
+                <?php if ($item["doneDate"] == NULL): ?>
+                    <tr class="tasks__item task <?= $item["doneDate"] == !NULL ? "task--completed" : ""?> <?= checkTimeLeft($item["deadline"]) <= 24 ? "task--important" : "" ?>">
                         <td class="task__select">
                             <label class="checkbox task__checkbox">
-                                <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?= $item["isDone"] == true ? "checked" : "" ?>>
+                                <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?= $item["doneDate"] == !NULL ? "checked" : "" ?>>
                                 <span class="checkbox__text"><?= htmlspecialchars($item["title"]);?></span>
                             </label>
                         </td>

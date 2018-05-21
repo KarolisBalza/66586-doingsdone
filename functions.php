@@ -121,13 +121,18 @@ function getProjectsTypes($link, $usersId) {
 }
 
 function checkDatesValidity($date) {
+    $isValid = false;
     $d = DateTime::createFromFormat('Y-m-d H:i', $date);
     if (($d && $d->format('Y-m-d H:i') == $date) OR empty($date)) {
-        return true;
+        $isValid = true;
     }
+    return $isValid;
 }
 
 function uploadFile($file) {
+    if(!file_exists("uploads")) {
+        mkdir("uploads", 0777, true);
+    }
     $fileName = str_replace(' ', '-', $file['preview']['name']);
     $fileName = preg_replace('/[^A-Za-z0-9.\-]/', '', $file['preview']['name']);
     $fileUrl = '/uploads/' . $fileName;

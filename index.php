@@ -1,8 +1,11 @@
 <?php
 require_once "functions.php";
 
-$usersId = 1;
+$show_complete_tasks = rand(0, 1);
+
+$usersId = 2;
 $projectsId = 0;
+$postedName = "";
 $errors =
     [
         "titleError" => false,
@@ -55,9 +58,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" AND $_POST["tasks_add"] = "Добави
         $res = mysqli_stmt_execute($stmt);
         if ($res) {
             if ($postedProject == NULL) {
-                header("Location: " . "http://66586-doingsdone/index.php?id=0");
+                header("Location: " . "index.php");
             } else {
-                header("Location: " . "http://66586-doingsdone/index.php?id=" . $postedProject);
+                header("Location: " . "index.php?id=" . $postedProject);
             }
         }
     }
