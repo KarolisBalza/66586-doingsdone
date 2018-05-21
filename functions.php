@@ -140,3 +140,21 @@ function uploadFile($file) {
     return $fileUrl;
 }
 
+function checkEmailTaken($link, $email) {
+    $sql = "SELECT email FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, 's',$email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    return mysqli_num_rows($result);
+}
+
+function addNewUser($link, $email, $password, $name){
+    $sql = "INSERT INTO users (email, password, name) VALUES (?, ?, ?)";
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, "sss", $email, $password, $name);
+    $res = mysqli_stmt_execute($stmt);
+    return $res;
+}
+
+
