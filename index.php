@@ -3,13 +3,23 @@ require_once "functions.php";
 
 $show_complete_tasks = rand(0, 1);
 
-$usersId = 2;
+$usersId = 0;
 $projectsId = 0;
 $postedName = "";
 $errors =
     [
         "titleError" => false,
         "dateError" => false,
+        "errors" => false
+    ];
+$registrationErrors =
+    [
+        "emailEmptyError" => false,
+        "emailTakenError" => false,
+        "emailValidityError" => false,
+        "emailError" => false,
+        "passwordError" => false,
+        "nameError" => false,
         "errors" => false
     ];
 
@@ -28,7 +38,45 @@ if (!$link) {
     $tasksData = getTasksDataById($link, $projectsId, $usersId);
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" AND $_POST["tasks_add"] = "Добавить") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["register"])) {
+    $userName = $_POST["name"];
+    $userEmail = $_POST["email"];
+    $userPassword = $_POST["password"];
+
+    if(empty($userName)) {
+        $registrationErrors["nameError"] = true;
+        $registrationErrors["errors"] = true;
+    }
+    if(empty($userPassword)){
+        $registrationErrors["passwordError"] = true;
+        $registrationErrors["errors"] = true;
+    }
+    if(empty($userEmail)){
+        $registrationErrors["emailEmptyError"] = true;
+        $registrationErrors["emailError"] = true;
+        $registrationErrors["errors"] = true;
+    }
+    if(!filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
+        $registrationErrors["emailValidityError"] = true;
+        $registrationErrors["emailError"] = true;
+        $registrationErrors["errors"] = true;
+    }
+    if($registrationErrors["emailEmptyError"] OR $registrationErrors["emailValidityError"]) {
+        $registrationErrors["emailError"] = true;
+    }
+    if(checkEmailTaken($link, $userEmail)){
+        $registrationErrors["emailTakenError"] = true;
+        $registrationErrors["emailError"] = true;
+        $registrationErrors["errors"] = true;
+    }
+    if(!$registrationErrors["errors"]) {
+        if(addNewUser($link, $userEmail, $userPassword, $userName)) {
+            print "added";
+        }
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["tasks_add"])) {
     $postedName = $_POST["name"];
     $postedDate = $_POST["date"];
     $postedFile = $_POST["preview"];
@@ -98,6 +146,15 @@ $layoutContent = includeLayout(
         "errors" => $errors
     ]
 );
+
+if ($usersId == 0) {
+    $layoutContent = includeLayout(
+        "templates" . DIRECTORY_SEPARATOR . "register.php",
+        [
+            "registrationErrors" => $registrationErrors
+        ]
+    );
+}
 
 print ($layoutContent);
 
