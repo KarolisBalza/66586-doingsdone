@@ -77,11 +77,13 @@ function checkTimeLeft ($date) {
 function getTasksDataById($link, $projectsId, $usersId) {
     if (!$projectsId) {
         $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE projects_id IS NULL AND users_id = ?";
-        $stmt = db_get_prepare_stmt($link, $sql, [$usersId]);
+        $stmt = mysqli_prepare($link, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $usersId);
     }
     else {
         $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE projects_id = ? AND users_id = ?";
-        $stmt = db_get_prepare_stmt($link, $sql, [$projectsId, $usersId]);
+        $stmt = mysqli_prepare($link, $sql);
+        mysqli_stmt_bind_param($stmt, "ii", $projectsId,$usersId);
     }
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
@@ -140,7 +142,7 @@ function uploadFile($file) {
     return $fileUrl;
 }
 
-function checkEmailTaken($link, $email) {
+function checkIfEmailExists($link, $email) {
     $sql = "SELECT email FROM users WHERE email = ?";
     $stmt = mysqli_prepare($link, $sql);
     mysqli_stmt_bind_param($stmt, 's',$email);
@@ -149,7 +151,27 @@ function checkEmailTaken($link, $email) {
     return mysqli_num_rows($result);
 }
 
+function checkIfPasswordCorrect($link, $email, $password) {
+    $sql = "SELECT password FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $passwordFromDb = mysqli_fetch_assoc($result);
+    return password_verify($password, $passwordFromDb["password"]);
+}
+
+function getUsersIdByEmail($link, $email) {
+    $sql = "SELECT id FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_assoc($result);
+}
+
 function addNewUser($link, $email, $password, $name){
+    $password = password_hash($password, PASSWORD_DEFAULT);
     $sql = "INSERT INTO users (email, password, name) VALUES (?, ?, ?)";
     $stmt = mysqli_prepare($link, $sql);
     mysqli_stmt_bind_param($stmt, "sss", $email, $password, $name);

@@ -31,7 +31,7 @@
                     <div class="user-menu__data">
                         <p>Константин</p>
 
-                        <a href="#">Выйти</a>
+                        <a href="index.php?page=logout">Выйти</a>
                     </div>
                 </div>
             </div>
