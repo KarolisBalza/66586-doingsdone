@@ -29,7 +29,7 @@
             <main class="content__main">
                 <h2 class="content__main-heading">Регистрация аккаунта</h2>
 
-                <form class="form" action="index.php?page=registration" method="post">
+                <form class="form" action="" method="post">
                     <div class="form__row">
                         <label class="form__label" for="email">E-mail <sup>*</sup></label>
 

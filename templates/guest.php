@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="../css/style.css">
 </head>
 
-<body class="body-background <?= $_GET["page"] == "login" ? "overlay" : "" ?>"><!--class="overlay"-->
+<body class="body-background <?= $login ? "overlay" : "" ?>"><!--class="overlay"-->
   <h1 class="visually-hidden">Дела в порядке</h1>
 
   <div class="page-wrapper">
