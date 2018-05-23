@@ -1,8 +1,5 @@
 <?php
 require_once "functions.php";
-require_once "controllers/register.php";
-require_once "controllers/index.php";
-require_once "controllers/guest.php";
 
 $show_complete_tasks = rand(0, 1);
 
