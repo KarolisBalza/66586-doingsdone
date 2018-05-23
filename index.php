@@ -1,20 +1,19 @@
 <?php
 require_once "functions.php";
+require_once "init.php";
+
+session_start();
 
 $show_complete_tasks = rand(0, 1);
 
-$link = mysqli_connect("localhost", "root", "", "doingsdone");
-mysqli_set_charset($link, "utf8");
 
 if ($_GET["page"] == "logout") {
-    if (isset($_COOKIE["user"])) {
-        unset($_COOKIE["user"]);
+    if (isset($_SESSION["user"])) {
+        $_SESSION = [];
     }
-    setcookie("user", "", time() - 3600, "/");
 }
 
-
-$usersId = $_COOKIE["user"];
+$usersId = $_SESSION["user"]["id"];
 $projectsId = 0;
 $postedName = "";
 $errors =
@@ -28,7 +27,7 @@ if ($_GET["page"] == "registration") {
     header("Location: registration.php");
 }
 
-if (!isset($_COOKIE["user"]) AND $_GET["page"] != "registration") {
+if (!isset($_SESSION["user"]) AND $_GET["page"] != "registration") {
     header("Location: guest.php");
 }
 
@@ -36,8 +35,11 @@ if ($_GET["page"] == "login") {
     header("Location: login.php");
 }
 
-if (isset($_COOKIE["user"])) {
+if(isset($_SESSION["user"])) {
+    $usersName = getUsersNameById($link, $_SESSION["user"]["id"]);
+}
 
+if (isset($_SESSION["user"])) {
     if (!$link) {
         exit(mysqli_connect_error());
     } else {
@@ -110,6 +112,7 @@ $layoutContent = includeLayout(
     "templates" . DIRECTORY_SEPARATOR . "layout.php",
     [
         "title" => "Дела в Порядке",
+        "usersName" => $usersName,
         "projectsTypes" => $projectsTypes,
         "tasksData" => $tasksData,
         "pageContent" => $pageContent,
@@ -120,6 +123,7 @@ $layoutContent = includeLayout(
         "errors" => $errors
     ]
 );
+
 print $layoutContent;
 
 

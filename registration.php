@@ -1,9 +1,7 @@
 <?php
 
 require_once "functions.php";
-
-$link = mysqli_connect("localhost", "root", "", "doingsdone");
-mysqli_set_charset($link, "utf8");
+require_once "init.php";
 
 $registrationErrors =
     [

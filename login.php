@@ -1,9 +1,7 @@
 <?php
 
 require_once "functions.php";
-
-$link = mysqli_connect("localhost", "root", "", "doingsdone");
-mysqli_set_charset($link, "utf8");
+require_once "init.php";
 
 $login = true;
 
@@ -39,7 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["login"])) {
     }
     if ($loginErrors["errors"] == false) {
         $usersId = getUsersIdByEmail($link, $userEmail);
-        setcookie("user", $usersId["id"], strtotime("+30 days"), "/");
+        session_start();
+        $_SESSION["user"] = $usersId;
         header("Location: index.php");
     }
 
