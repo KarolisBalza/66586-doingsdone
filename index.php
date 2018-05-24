@@ -1,9 +1,19 @@
 <?php
 require_once "functions.php";
+require_once "init.php";
+
+session_start();
 
 $show_complete_tasks = rand(0, 1);
 
-$usersId = 0;
+
+if ($_GET["page"] == "logout") {
+    if (isset($_SESSION["user"])) {
+        $_SESSION = [];
+    }
+}
+
+$usersId = $_SESSION["user"]["id"];
 $projectsId = 0;
 $postedName = "";
 $errors =
@@ -12,103 +22,69 @@ $errors =
         "dateError" => false,
         "errors" => false
     ];
-$registrationErrors =
-    [
-        "emailEmptyError" => false,
-        "emailTakenError" => false,
-        "emailValidityError" => false,
-        "emailError" => false,
-        "passwordError" => false,
-        "nameError" => false,
-        "errors" => false
-    ];
 
-$link = mysqli_connect("localhost", "root", "", "doingsdone");
-mysqli_set_charset($link, "utf8");
-
-
-if (!$link) {
-    exit(mysqli_connect_error());
-} else {
-    $projectsTypes = getProjectsTypes($link, $usersId);
-    array_unshift($projectsTypes, ["id" => 0, "title" => "Входяшие"]);
-    if (isset($_GET["id"])) {
-        $projectsId = (int)$_GET["id"];
-    }
-    $tasksData = getTasksDataById($link, $projectsId, $usersId);
+if ($_GET["page"] == "registration") {
+    header("Location: registration.php");
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["register"])) {
-    $userName = $_POST["name"];
-    $userEmail = $_POST["email"];
-    $userPassword = $_POST["password"];
-
-    if(empty($userName)) {
-        $registrationErrors["nameError"] = true;
-        $registrationErrors["errors"] = true;
-    }
-    if(empty($userPassword)){
-        $registrationErrors["passwordError"] = true;
-        $registrationErrors["errors"] = true;
-    }
-    if(empty($userEmail)){
-        $registrationErrors["emailEmptyError"] = true;
-        $registrationErrors["emailError"] = true;
-        $registrationErrors["errors"] = true;
-    }
-    if(!filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
-        $registrationErrors["emailValidityError"] = true;
-        $registrationErrors["emailError"] = true;
-        $registrationErrors["errors"] = true;
-    }
-    if($registrationErrors["emailEmptyError"] OR $registrationErrors["emailValidityError"]) {
-        $registrationErrors["emailError"] = true;
-    }
-    if(checkEmailTaken($link, $userEmail)){
-        $registrationErrors["emailTakenError"] = true;
-        $registrationErrors["emailError"] = true;
-        $registrationErrors["errors"] = true;
-    }
-    if(!$registrationErrors["errors"]) {
-        if(addNewUser($link, $userEmail, $userPassword, $userName)) {
-            print "added";
-        }
-    }
+if (!isset($_SESSION["user"]) AND $_GET["page"] != "registration") {
+    header("Location: guest.php");
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["tasks_add"])) {
-    $postedName = $_POST["name"];
-    $postedDate = $_POST["date"];
-    $postedFile = $_POST["preview"];
-    $postedProject = $_POST["project"];
-    if (empty($postedName)) {
-        $errors["titleError"] = true;
-        $errors["errors"] = true;
-    }
-    if (empty($postedProject)) {
-        $postedProject = NULL;
-    }
-    if (!checkDatesValidity($postedDate)) {
-        $errors["dateError"] = true;
-        $errors["errors"] = true;
-    }
-    if (empty($postedDate)) {
-        $postedDate = NULL;
+if ($_GET["page"] == "login") {
+    header("Location: login.php");
+}
+
+if(isset($_SESSION["user"])) {
+    $usersName = getUsersNameById($link, $_SESSION["user"]["id"]);
+}
+
+if (isset($_SESSION["user"])) {
+    if (!$link) {
+        exit(mysqli_connect_error());
+    } else {
+        $projectsTypes = getProjectsTypes($link, $usersId);
+        array_unshift($projectsTypes, ["id" => 0, "title" => "Входяшие"]);
+        if (isset($_GET["id"])) {
+            $projectsId = (int)$_GET["id"];
+        }
+        $tasksData = getTasksDataById($link, $projectsId, $usersId);
     }
 
-    if (!$errors["errors"]) {
-        if (!empty($_FILES["preview"]["name"])) {
-            $fileUrl = uploadFile($_FILES);
+    if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["task_add"])) {
+        $postedName = $_POST["name"];
+        $postedDate = $_POST["date"];
+        $postedFile = $_POST["preview"];
+        $postedProject = $_POST["project"];
+        if (empty($postedName)) {
+            $errors["titleError"] = true;
+            $errors["errors"] = true;
         }
-        $sql = "INSERT INTO tasks (title, file, projects_id, deadline, users_id) VALUES (?, ?, ? , ?, ?)";
-        $stmt = mysqli_prepare($link, $sql);
-        mysqli_stmt_bind_param($stmt, "ssisi", $postedName, $fileUrl, $postedProject, $postedDate, $usersId);
-        $res = mysqli_stmt_execute($stmt);
-        if ($res) {
-            if ($postedProject == NULL) {
-                header("Location: " . "index.php");
-            } else {
-                header("Location: " . "index.php?id=" . $postedProject);
+        if (empty($postedProject)) {
+            $postedProject = NULL;
+        }
+        if (!checkDatesValidity($postedDate)) {
+            $errors["dateError"] = true;
+            $errors["errors"] = true;
+        }
+        if (empty($postedDate)) {
+            $postedDate = NULL;
+        }
+
+        if (!$errors["errors"]) {
+            if (!empty($_FILES["preview"]["name"])) {
+                $fileUrl = uploadFile($_FILES);
+            }
+            $sql = "INSERT INTO tasks (title, file, projects_id, deadline, users_id) VALUES (?, ?, ? , ?, ?)";
+            $stmt = mysqli_prepare($link, $sql);
+            mysqli_stmt_bind_param($stmt, "ssisi", $postedName, $fileUrl, $postedProject, $postedDate, $usersId);
+            $res = mysqli_stmt_execute($stmt);
+            if ($res) {
+                if ($postedProject == NULL) {
+                    header("Location: " . "index.php");
+                } else {
+                    header("Location: " . "index.php?id=" . $postedProject);
+                }
             }
         }
     }
@@ -136,6 +112,7 @@ $layoutContent = includeLayout(
     "templates" . DIRECTORY_SEPARATOR . "layout.php",
     [
         "title" => "Дела в Порядке",
+        "usersName" => $usersName,
         "projectsTypes" => $projectsTypes,
         "tasksData" => $tasksData,
         "pageContent" => $pageContent,
@@ -147,15 +124,8 @@ $layoutContent = includeLayout(
     ]
 );
 
-if ($usersId == 0) {
-    $layoutContent = includeLayout(
-        "templates" . DIRECTORY_SEPARATOR . "register.php",
-        [
-            "registrationErrors" => $registrationErrors
-        ]
-    );
-}
+print $layoutContent;
 
-print ($layoutContent);
+
 
 
