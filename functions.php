@@ -18,6 +18,10 @@ function getProjectsCount($link, $projectsId, $usersId)
         $sql = "SELECT * FROM tasks WHERE projects_id IS NULL AND users_id = ?";
         $stmt = mysqli_prepare($link, $sql);
         mysqli_stmt_bind_param($stmt, 'i', $usersId);
+    } else if($projectsId == 1) {
+        $sql = "SELECT * FROM tasks WHERE users_id = ?";
+        $stmt = mysqli_prepare($link, $sql);
+        mysqli_stmt_bind_param($stmt, 'i', $usersId);
     } else {
         $sql = "SELECT * FROM tasks WHERE projects_id = ? AND users_id = ?";
         $stmt = mysqli_prepare($link, $sql);
@@ -81,6 +85,10 @@ function getTasksDataById($link, $projectsId, $usersId)
 {
     if (!$projectsId) {
         $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE projects_id IS NULL AND users_id = ?";
+        $stmt = mysqli_prepare($link, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $usersId);
+    } else if($projectsId == 1) {
+        $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE users_id = ?";
         $stmt = mysqli_prepare($link, $sql);
         mysqli_stmt_bind_param($stmt, "i", $usersId);
     } else {
@@ -195,6 +203,51 @@ function getUsersNameById($link, $usersId)
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     return mysqli_fetch_assoc($result);
+}
+
+function addNewProject($link, $usersId, $projectName)
+{
+    $sql = "SELECT title FROM projects WHERE users_id = ? AND title = ?";
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, 'is', $usersId, $projectName);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    if (mysqli_num_rows($result) == 0) {
+        $sql = "INSERT INTO projects (title, users_id) VALUES (?, ?)";
+        $stmt = mysqli_prepare($link, $sql);
+        mysqli_stmt_bind_param($stmt, "si", $projectName, $usersId);
+        return mysqli_stmt_execute($stmt);
+    }
+    return false;
+}
+
+function checkTaskAsDone($link, $taskId)
+{
+    $sql = "UPDATE tasks SET doneDate = NOW() WHERE id = ?";
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $taskId);
+    mysqli_stmt_execute($stmt);
+}
+
+function getTasksDataByDate($link, $usersId, $date)
+{
+    switch ($date) {
+        case "today":
+            $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE users_id = ? AND STR_TO_DATE(CURDATE(), \"%Y-%m-%d\") = STR_TO_DATE(deadline, \"%Y-%m-%d\")";
+            break;
+        case "tomorrow":
+            $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE users_id = ? AND STR_TO_DATE(CURDATE() + INTERVAL 1 DAY, \"%Y-%m-%d\") = STR_TO_DATE(deadline, \"%Y-%m-%d\")";
+            break;
+        case "failed":
+            $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE users_id = ? AND STR_TO_DATE(CURDATE(), \"%Y-%m-%d\") > STR_TO_DATE(deadline, \"%Y-%m-%d\") AND doneDate = NULL";
+            break;
+    }
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $usersId);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $result = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    return $result;
 }
 
 

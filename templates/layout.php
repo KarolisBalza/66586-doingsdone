@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/flatpickr.min.css">
 </head>
 
-<body <?= $errors["errors"] ? "class=\"overlay\"" : "" ?> ><!--class="overlay"-->
+<body <?= $errors["errors"] || $addProjectErrors["errors"] ? "class=\"overlay\"" : "" ?> ><!--class="overlay"-->
 <h1 class="visually-hidden">Дела в порядке</h1>
 
 <div class="page-wrapper">
@@ -106,5 +106,6 @@
 <script src="flatpickr.js"></script>
 <script src="script.js"></script>
 <?= $addTask ?>
+<?= $addProject ?>
 </body>
 </html>
