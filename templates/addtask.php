@@ -25,7 +25,7 @@
 
         <div class="form__row">
             <label class="form__label" for="date">Срок выполнения</label>
-            <p class="form__message"><?= $errors["dateError"] ? "Некорректная дата" : "" ?></p>
+            <p class="form__message"><?= $errors["dateError"] ? "Некорректная дата. Формат даты «ГГГГ-ММ-ДД ЧЧ:ММ»" : "" ?></p>
             <input class="form__input form__input--date <?= $errors["dateError"] ? "form__input--error" : "" ?>"
                    type="text" name="date" id="date"
                    placeholder="Введите дату и время">

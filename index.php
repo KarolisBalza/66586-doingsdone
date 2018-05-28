@@ -1,4 +1,7 @@
 <?php
+
+// О недоработках знаем. Пока не успели поправить.
+
 require_once "functions.php";
 require_once "init.php";
 
