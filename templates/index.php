@@ -9,10 +9,10 @@
 
     <div class="tasks-controls">
         <nav class="tasks-switch">
-            <a href="/" class="tasks-switch__item <?= !isset($_GET["today"]) && !isset($_GET["tomorrow"]) && !isset($_GET["failed"]) ? "tasks-switch__item--active" : "" ?>">Все задачи</a>
-            <a href="index.php?today" class="tasks-switch__item <?= isset($_GET["today"])? "tasks-switch__item--active" : "" ?>">Повестка дня</a>
-            <a href="index.php?tomorrow" class="tasks-switch__item <?= isset($_GET["tomorrow"])? "tasks-switch__item--active" : "" ?>">Завтра</a>
-            <a href="index.php?failed" class="tasks-switch__item <?= isset($_GET["failed"])? "tasks-switch__item--active" : "" ?>">Просроченные</a>
+            <a href="index.php<?=$projectsId ? "?id=" . $projectsId : "" ?>" class="tasks-switch__item <?= !isset($_GET["today"]) && !isset($_GET["tomorrow"]) && !isset($_GET["failed"]) ? "tasks-switch__item--active" : "" ?>">Все задачи</a>
+            <a href="index.php?today<?=$projectsId ? "&id=" . $projectsId : ""?>" class="tasks-switch__item <?= isset($_GET["today"])? "tasks-switch__item--active" : "" ?>">Повестка дня</a>
+            <a href="index.php?tomorrow<?=$projectsId ? "&id=" . $projectsId : ""?>" class="tasks-switch__item <?= isset($_GET["tomorrow"])? "tasks-switch__item--active" : "" ?>">Завтра</a>
+            <a href="index.php?failed<?=$projectsId ? "&id=" . $projectsId : ""?>" class="tasks-switch__item <?= isset($_GET["failed"])? "tasks-switch__item--active" : "" ?>">Просроченные</a>
         </nav>
 
         <label class="checkbox">
@@ -24,7 +24,7 @@
     <table class="tasks">
             <?php if ($show_complete_tasks == 1): ?>
                 <?php foreach ($tasksData as $key => $item):?>
-                <tr class="tasks__item task <?= $item["doneDate"] == !NULL ? "task--completed" : ""?> <?= checkTimeLeft($item["deadline"]) <= 24 ? "task--important" : "" ?>" >
+                <tr class="tasks__item task <?= $item["doneDate"] == !NULL ? "task--completed" : ""?> <?= checkTimeLeft($item["deadline_format"]) <= 24 ? "task--important" : "" ?>" >
                     <td class="task__select">
                         <label class="checkbox task__checkbox">
                             <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="<?= $item["id"]?>" <?= $item["doneDate"] == !NULL ? "checked" : "" ?>>
@@ -36,13 +36,13 @@
                         <a class="download-link" href="<?= $item["file"]?>">File</a>
                         <? endif; ?>
                     </td>
-                    <td class="task__date"><?= htmlspecialchars($item["deadline"]);?></td>
+                    <td class="task__date"><?= htmlspecialchars($item["deadline_format"] ?? "");?></td>
                 </tr>
                 <?php endforeach ?>
             <?php else: ?>
                 <?php foreach ($tasksData as $key => $item):?>
                 <?php if ($item["doneDate"] == NULL): ?>
-                    <tr class="tasks__item task <?= $item["doneDate"] == !NULL ? "task--completed" : ""?> <?= checkTimeLeft($item["deadline"]) <= 24 ? "task--important" : "" ?>">
+                    <tr class="tasks__item task <?= $item["doneDate"] == !NULL ? "task--completed" : ""?> <?= checkTimeLeft($item["deadline_format"]) <= 24 ? "task--important" : "" ?>">
                         <td class="task__select">
                             <label class="checkbox task__checkbox">
                                 <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="<?= $item["id"]?>" <?= $item["doneDate"] == !NULL ? "checked" : "" ?>>
@@ -54,7 +54,7 @@
                                 <a class="download-link" href="<?= $item["file"]?>">File</a>
                             <? endif; ?>
                         </td>
-                        <td class="task__date"><?= htmlspecialchars($item["deadline"]);?></td>
+                        <td class="task__date"><?= htmlspecialchars($item["deadline_format"] ?? "");?></td>
                     </tr>
                 <?php endif; ?>
                 <?php endforeach;?>

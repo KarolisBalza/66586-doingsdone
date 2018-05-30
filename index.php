@@ -7,24 +7,32 @@ require_once "init.php";
 
 session_start();
 
-$show_complete_tasks = rand(0, 1);
+$show_complete_tasks = "";
 
-
-if ($_GET["page"] == "logout") {
-    if (isset($_SESSION["user"])) {
-        $_SESSION = [];
+if (isset($_GET["page"])) {
+    if ($_GET["page"] == "logout") {
+        if (isset($_SESSION["user"])) {
+            $_SESSION = [];
+        }
     }
 }
 
-$usersId = $_SESSION["user"]["id"];
-$projectsId = 1;
+
+if (isset($_SESSION["user"]["id"])) {
+    $usersId = $_SESSION["user"]["id"];
+}
+
+
+$projectsId = null;
 $postedName = "";
+$postedTitle = "";
 $errors =
     [
         "titleError" => false,
         "dateError" => false,
         "errors" => false,
-        "projectExists" => false
+        "projectExists" => false,
+        "projectEmpty" => false
     ];
 $addProjectErrors = [
     "emptyTitle" => false,
@@ -32,23 +40,33 @@ $addProjectErrors = [
     "errors" => false
 ];
 
-if ($_GET["page"] == "registration") {
-    header("Location: registration.php");
-}
-
-if (!isset($_SESSION["user"]) AND $_GET["page"] != "registration") {
+if (!isset($_SESSION["user"])) {
     header("Location: guest.php");
 }
 
-if ($_GET["page"] == "login") {
-    header("Location: login.php");
+if (isset($_GET["page"])) {
+    if ($_GET["page"] != "registration") {
+        header("Location: guest.php");
+    }
 }
 
-if(isset($_SESSION["user"])) {
+if (isset($_GET["page"])) {
+    if ($_GET["page"] == "login") {
+        header("Location: login.php");
+    }
+}
+
+if (isset($_GET["page"])) {
+    if ($_GET["page"] == "registration") {
+        header("Location: registration.php");
+    }
+}
+
+if (isset($_SESSION["user"])) {
     $usersName = getUsersNameById($link, $_SESSION["user"]["id"]);
 }
 
-if(isset($_GET["task_id"])) {
+if (isset($_GET["task_id"])) {
     $taskId = $_GET["task_id"];
     checkTaskAsDone($link, $taskId);
 }
@@ -58,64 +76,55 @@ if (isset($_SESSION["user"])) {
         exit(mysqli_connect_error());
     } else {
         $projectsTypes = getProjectsTypes($link, $usersId);
-        array_unshift($projectsTypes, ["id" => 0, "title" => "Входяшие"]);
-        array_unshift($projectsTypes, ["id" => 1, "title" => "Все"]);
         if (isset($_GET["id"])) {
             $projectsId = (int)$_GET["id"];
         }
         $tasksData = getTasksDataById($link, $projectsId, $usersId);
     }
+}
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["task_add"])) {
-        $postedName = $_POST["name"];
-        $postedDate = $_POST["date"];
-        $postedFile = $_POST["preview"];
+if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["task_add"])) {
+    $fileUrl = NULL;
+    $postedName = $_POST["name"];
+    $postedDate = $_POST["date"];
+    if (!empty($_POST["project"])) {
         $postedProject = $_POST["project"];
-        if (empty($postedName)) {
-            $errors["titleError"] = true;
-            $errors["errors"] = true;
-        }
-        if (empty($postedProject)) {
-            $postedProject = NULL;
-        }
-        if (!checkDatesValidity($postedDate)) {
-            $errors["dateError"] = true;
-            $errors["errors"] = true;
-        }
-        if (empty($postedDate)) {
-            $postedDate = NULL;
-        }
+    }
+    if (isset($_POST["preview"])) {
+        $postedFile = $_POST["preview"];
+    }
+    if (empty($postedName)) {
+        $errors["titleError"] = true;
+        $errors["errors"] = true;
+    }
+    if (empty($postedProject)) {
+        $postedProject = NULL;
+    }
+    if (!checkDatesValidity($postedDate)) {
+        $errors["dateError"] = true;
+        $errors["errors"] = true;
+    }
+    if (empty($postedDate)) {
+        $postedDate = NULL;
+    }
 
-        if (!$errors["errors"]) {
-            if (!empty($_FILES["preview"]["name"])) {
-                $fileUrl = uploadFile($_FILES);
-            }
-            $sql = "INSERT INTO tasks (title, file, projects_id, deadline, users_id) VALUES (?, ?, ? , ?, ?)";
-            $stmt = mysqli_prepare($link, $sql);
-            mysqli_stmt_bind_param($stmt, "ssisi", $postedName, $fileUrl, $postedProject, $postedDate, $usersId);
-            $res = mysqli_stmt_execute($stmt);
-            if ($res) {
-                if ($postedProject == NULL) {
-                    header("Location: " . "index.php");
-                } else {
-                    header("Location: " . "index.php?id=" . $postedProject);
-                }
-            }
+    if (!$errors["errors"]) {
+        if (!empty($_FILES["preview"]["name"])) {
+            $fileUrl = uploadFile($_FILES);
         }
+        addNewTask($link, $postedName, $fileUrl, $postedProject, $postedDate, $usersId);
     }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["project_add"])) {
     $projectName = $_POST["name"];
-    if(empty($projectName)) {
+    if (empty($projectName)) {
         $addProjectErrors["emptyTitle"] = true;
         $addProjectErrors["errors"] = true;
-    }
-    else {
-        if(addNewProject($link, $usersId, $projectName)){
+    } else {
+        if (addNewProject($link, $usersId, $projectName)) {
             header("Location: " . "index.php?id=1");
-        }
-        else {
+        } else {
             $postedTitle = $projectName;
             $addProjectErrors["projectExists"] = true;
             $addProjectErrors["errors"] = true;
@@ -123,23 +132,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["project_add"])) {
     }
 }
 
-if(isset($_GET["today"])) {
-    $tasksData = getTasksDataByDate($link, $usersId, "today");
+if (isset($_GET["today"])) {
+    $tasksData = getTasksDataByDate($link, $usersId, $projectsId, "today");
 }
 
-if(isset($_GET["tomorrow"])) {
-    $tasksData = getTasksDataByDate($link, $usersId, "tomorrow");
+if (isset($_GET["tomorrow"])) {
+    $tasksData = getTasksDataByDate($link, $usersId, $projectsId, "tomorrow");
 };
 
-if(isset($_GET["failed"])) {
-    $tasksData = getTasksDataByDate($link, $usersId, "failed");
+if (isset($_GET["failed"])) {
+    $tasksData = getTasksDataByDate($link, $usersId, $projectsId, "failed");
 };
+
+if(isset($_GET["show_completed"])){
+    if($_GET["show_completed"] == 1){
+        $show_complete_tasks = 1;
+    }
+    else $show_complete_tasks = 0;
+}
 
 $pageContent = includeLayout(
     "templates" . DIRECTORY_SEPARATOR . "index.php",
     [
         "show_complete_tasks" => $show_complete_tasks,
         "tasksData" => $tasksData,
+        "projectsId" => $projectsId
     ]
 );
 
@@ -175,7 +192,7 @@ $layoutContent = includeLayout(
         "addTask" => $addTask,
         "addProject" => $addProject,
         "errors" => $errors,
-         "addProjectErrors" => $addProjectErrors
+        "addProjectErrors" => $addProjectErrors
     ]
 );
 

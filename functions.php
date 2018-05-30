@@ -18,7 +18,7 @@ function getProjectsCount($link, $projectsId, $usersId)
         $sql = "SELECT * FROM tasks WHERE projects_id IS NULL AND users_id = ?";
         $stmt = mysqli_prepare($link, $sql);
         mysqli_stmt_bind_param($stmt, 'i', $usersId);
-    } else if($projectsId == 1) {
+    } else if ($projectsId == 1) {
         $sql = "SELECT * FROM tasks WHERE users_id = ?";
         $stmt = mysqli_prepare($link, $sql);
         mysqli_stmt_bind_param($stmt, 'i', $usersId);
@@ -84,15 +84,11 @@ function checkTimeLeft($date)
 function getTasksDataById($link, $projectsId, $usersId)
 {
     if (!$projectsId) {
-        $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE projects_id IS NULL AND users_id = ?";
-        $stmt = mysqli_prepare($link, $sql);
-        mysqli_stmt_bind_param($stmt, "i", $usersId);
-    } else if($projectsId == 1) {
-        $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE users_id = ?";
+        $sql = "SELECT *, IF (deadline is NULL, '', DATE_FORMAT(deadline, '%Y-%m-%d')) AS deadline_format FROM tasks WHERE projects_id IS NULL AND users_id = ?";
         $stmt = mysqli_prepare($link, $sql);
         mysqli_stmt_bind_param($stmt, "i", $usersId);
     } else {
-        $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE projects_id = ? AND users_id = ?";
+        $sql = "SELECT *, IF (deadline is NULL, '', DATE_FORMAT(deadline, '%Y-%m-%d')) AS deadline_format FROM tasks WHERE projects_id = ? AND users_id = ?";
         $stmt = mysqli_prepare($link, $sql);
         mysqli_stmt_bind_param($stmt, "ii", $projectsId, $usersId);
     }
@@ -188,7 +184,7 @@ function getUsersIdByEmail($link, $email)
 function addNewUser($link, $email, $password, $name)
 {
     $password = password_hash($password, PASSWORD_DEFAULT);
-    $sql = "INSERT INTO users (email, password, name) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO users (email, password, name, regDate) VALUES (?, ?, ?, NOW())";
     $stmt = mysqli_prepare($link, $sql);
     mysqli_stmt_bind_param($stmt, "sss", $email, $password, $name);
     $res = mysqli_stmt_execute($stmt);
@@ -221,6 +217,21 @@ function addNewProject($link, $usersId, $projectName)
     return false;
 }
 
+function addNewTask($link, $postedName, $fileUrl, $postedProject, $postedDate, $usersId)
+{
+    $sql = "INSERT INTO tasks (title, file, projects_id, deadline, users_id, createDate) VALUES (?, ?, ? , ?, ?, NOW())";
+    $stmt = mysqli_prepare($link, $sql);
+    mysqli_stmt_bind_param($stmt, "ssisi", $postedName, $fileUrl, $postedProject, $postedDate, $usersId);
+    $res = mysqli_stmt_execute($stmt);
+    if ($res) {
+        if ($postedProject == NULL) {
+            header("Location: " . "index.php");
+        } else {
+            header("Location: " . "index.php?id=" . $postedProject);
+        }
+    }
+}
+
 function checkTaskAsDone($link, $taskId)
 {
     $sql = "UPDATE tasks SET doneDate = NOW() WHERE id = ?";
@@ -229,21 +240,41 @@ function checkTaskAsDone($link, $taskId)
     mysqli_stmt_execute($stmt);
 }
 
-function getTasksDataByDate($link, $usersId, $date)
+function getTasksDataByDate($link, $usersId, $projectsId, $date)
+
 {
-    switch ($date) {
-        case "today":
-            $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE users_id = ? AND STR_TO_DATE(CURDATE(), \"%Y-%m-%d\") = STR_TO_DATE(deadline, \"%Y-%m-%d\")";
-            break;
-        case "tomorrow":
-            $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE users_id = ? AND STR_TO_DATE(CURDATE() + INTERVAL 1 DAY, \"%Y-%m-%d\") = STR_TO_DATE(deadline, \"%Y-%m-%d\")";
-            break;
-        case "failed":
-            $sql = "SELECT *, DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline FROM tasks WHERE users_id = ? AND STR_TO_DATE(CURDATE(), \"%Y-%m-%d\") > STR_TO_DATE(deadline, \"%Y-%m-%d\") AND doneDate = NULL";
-            break;
+    if(empty($projectsId)) {
+        switch ($date) {
+            case "today":
+                $sql = "SELECT *, IF (deadline is NULL, '', DATE_FORMAT(deadline, '%Y-%m-%d')) AS deadline_format FROM tasks WHERE users_id = ? AND projects_id IS NULL AND STR_TO_DATE(CURDATE(), \"%Y-%m-%d\") = STR_TO_DATE(deadline, \"%Y-%m-%d\")";
+                break;
+            case "tomorrow":
+                $sql = "SELECT *, IF (deadline is NULL, '', DATE_FORMAT(deadline, '%Y-%m-%d')) AS deadline_format FROM tasks WHERE users_id = ? AND projects_id IS NULL AND STR_TO_DATE(CURDATE() + INTERVAL 1 DAY, \"%Y-%m-%d\") = STR_TO_DATE(deadline, \"%Y-%m-%d\")";
+                break;
+            case "failed":
+                $sql = "SELECT *, IF (deadline is NULL, '', DATE_FORMAT(deadline, '%Y-%m-%d')) AS deadline_format FROM tasks WHERE users_id = ? AND projects_id IS NULL AND NOW() > deadline";
+                break;
+        }
+        $stmt = mysqli_prepare($link, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $usersId);
     }
-    $stmt = mysqli_prepare($link, $sql);
-    mysqli_stmt_bind_param($stmt, "i", $usersId);
+    else{
+        switch ($date) {
+            case "today":
+                $sql = "SELECT *, IF (deadline is NULL, '', DATE_FORMAT(deadline, '%Y-%m-%d')) AS deadline_format FROM tasks WHERE users_id = ? AND projects_id = ? AND STR_TO_DATE(CURDATE(), \"%Y-%m-%d\") = STR_TO_DATE(deadline, \"%Y-%m-%d\")";
+                break;
+            case "tomorrow":
+                $sql = "SELECT *, IF (deadline is NULL, '', DATE_FORMAT(deadline, '%Y-%m-%d')) AS deadline_format FROM tasks WHERE users_id = ? AND projects_id = ? AND STR_TO_DATE(CURDATE() + INTERVAL 1 DAY, \"%Y-%m-%d\") = STR_TO_DATE(deadline, \"%Y-%m-%d\")";
+                break;
+            case "failed":
+                $sql = "SELECT *, IF (deadline is NULL, '', DATE_FORMAT(deadline, '%Y-%m-%d')) AS deadline_format FROM tasks WHERE users_id = ? AND projects_id = ? AND NOW() > deadline";
+                break;
+        }
+        $stmt = mysqli_prepare($link, $sql);
+        mysqli_stmt_bind_param($stmt, "ii", $usersId, $projectsId);
+    }
+
+
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
     $result = mysqli_fetch_all($res, MYSQLI_ASSOC);

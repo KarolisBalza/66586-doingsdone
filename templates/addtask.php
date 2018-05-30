@@ -8,16 +8,17 @@
             <label class="form__label" for="name">Название <sup>*</sup></label>
             <p class="form__message"><?= $errors["titleError"] ? "Заполните это поле" : "" ?></p>
             <input class="form__input <?= $errors["titleError"] ? "form__input--error" : "" ?>" type="text" name="name"
-                   id="name" value="<?= $postedName ?>" placeholder="Введите название">
+                   id="name" value="<?= $postedName?>" placeholder="Введите название">
         </div>
 
         <div class="form__row">
-            <label class="form__label" for="project">Проект <sup>*</sup></label>
-
-            <select class="form__input form__input--select" name="project" id="project">
+            <label class="form__label" for="project">Проект</label>
+            <p class="form__message"><?= $errors["projectEmpty"] ? "Выберите проект" : "" ?></p>
+            <select class="form__input form__input--select <?= $errors["projectEmpty"] ? "form__input--error" : "" ?>" name="project" id="project">
+                <option value=""></option>
                 <?php foreach ($projectsTypes as $item): ?>
                     <?php if ($item["id"] != 1): ?>
-                        <option value="<?= $item["id"] ?>"><?= $item["title"] ?></option>
+                        <option value="<?= $item["id"] ?>"><?= htmlspecialchars($item["title"])?></option>
                     <?php endif; ?>
                 <?php endforeach; ?>
             </select>

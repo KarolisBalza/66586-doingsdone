@@ -43,9 +43,13 @@
 
                 <nav class="main-navigation">
                     <ul class="main-navigation__list">
+                        <li class="main-navigation__list-item <?= empty($projectsId) ? "main-navigation__list-item--active" : "" ?>">
+                            <a class="main-navigation__list-item-link" href="index.php">Входяшие</a>
+                            <span class="main-navigation__list-item-count"><?= getProjectsCount($link, "", $usersId) ?></span>
+                        </li>
                         <?php foreach ($projectsTypes as $key => $item): ?>
-                                <li class="main-navigation__list-item <?= $item["id"] == $projectsId ? "main-navigation__list-item--active" : "" ?>">
-                                    <a class="main-navigation__list-item-link" href="index.php?id=<?=$item["id"];?>"><?=$item["title"];?></a>
+                                <li class="main-navigation__list-item <?= $item["id"] === $projectsId ? "main-navigation__list-item--active" : "" ?>">
+                                    <a class="main-navigation__list-item-link" href="index.php?id=<?=$item["id"];?>"><?=strip_tags($item["title"]);?></a>
                                     <span class="main-navigation__list-item-count"><?= getProjectsCount($link, $item["id"], $usersId) ?></span>
                                 </li>
                         <?php endforeach; ?>
