@@ -1,6 +1,5 @@
 <?php
 
-// О недоработках знаем. Пока не успели поправить.
 
 require_once "functions.php";
 require_once "init.php";
@@ -10,7 +9,7 @@ session_start();
 $show_complete_tasks = "";
 
 if (isset($_GET["page"])) {
-    if ($_GET["page"] == "logout") {
+    if ($_GET["page"] === "logout") {
         if (isset($_SESSION["user"])) {
             $_SESSION = [];
         }
@@ -20,6 +19,8 @@ if (isset($_GET["page"])) {
 
 if (isset($_SESSION["user"]["id"])) {
     $usersId = $_SESSION["user"]["id"];
+}else {
+    $usersId = 0;
 }
 
 
@@ -51,13 +52,13 @@ if (isset($_GET["page"])) {
 }
 
 if (isset($_GET["page"])) {
-    if ($_GET["page"] == "login") {
+    if ($_GET["page"] === "login") {
         header("Location: login.php");
     }
 }
 
 if (isset($_GET["page"])) {
-    if ($_GET["page"] == "registration") {
+    if ($_GET["page"] === "registration") {
         header("Location: registration.php");
     }
 }
@@ -71,6 +72,8 @@ if (isset($_GET["task_id"])) {
     checkTaskAsDone($link, $taskId);
 }
 
+$projectsTypes = [];
+
 if (isset($_SESSION["user"])) {
     if (!$link) {
         exit(mysqli_connect_error());
@@ -83,7 +86,7 @@ if (isset($_SESSION["user"])) {
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["task_add"])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST" AND isset($_POST["task_add"])) {
     $fileUrl = NULL;
     $postedName = $_POST["name"];
     $postedDate = $_POST["date"];
@@ -116,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["task_add"])) {
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["project_add"])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST" AND isset($_POST["project_add"])) {
     $projectName = $_POST["name"];
     if (empty($projectName)) {
         $addProjectErrors["emptyTitle"] = true;
@@ -132,20 +135,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" AND isset($_POST["project_add"])) {
     }
 }
 
+
 if (isset($_GET["today"])) {
     $tasksData = getTasksDataByDate($link, $usersId, $projectsId, "today");
+} else if (isset($_GET["tomorrow"])) {
+    $tasksData = getTasksDataByDate($link, $usersId, $projectsId, "tomorrow");
+} else if (isset($_GET["failed"])) {
+    $tasksData = getTasksDataByDate($link, $usersId, $projectsId, "failed");
+} else {
+    $tasksData = getTasksDataById($link,  $projectsId, $_SESSION["user"]["id"] ?? 0);
 }
 
-if (isset($_GET["tomorrow"])) {
-    $tasksData = getTasksDataByDate($link, $usersId, $projectsId, "tomorrow");
-};
-
-if (isset($_GET["failed"])) {
-    $tasksData = getTasksDataByDate($link, $usersId, $projectsId, "failed");
-};
-
 if(isset($_GET["show_completed"])){
-    if($_GET["show_completed"] == 1){
+    if($_GET["show_completed"] === "1"){
         $show_complete_tasks = 1;
     }
     else $show_complete_tasks = 0;
@@ -177,12 +179,11 @@ $addProject = includeLayout(
     ]
 );
 
-
 $layoutContent = includeLayout(
     "templates" . DIRECTORY_SEPARATOR . "layout.php",
     [
         "title" => "Дела в Порядке",
-        "usersName" => $usersName,
+        "usersName" => $usersName ?? "",
         "projectsTypes" => $projectsTypes,
         "tasksData" => $tasksData,
         "pageContent" => $pageContent,

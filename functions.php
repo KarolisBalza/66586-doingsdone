@@ -18,7 +18,7 @@ function getProjectsCount($link, $projectsId, $usersId)
         $sql = "SELECT * FROM tasks WHERE projects_id IS NULL AND users_id = ?";
         $stmt = mysqli_prepare($link, $sql);
         mysqli_stmt_bind_param($stmt, 'i', $usersId);
-    } else if ($projectsId == 1) {
+    } else if ($projectsId === 1) {
         $sql = "SELECT * FROM tasks WHERE users_id = ?";
         $stmt = mysqli_prepare($link, $sql);
         mysqli_stmt_bind_param($stmt, 'i', $usersId);
@@ -132,7 +132,7 @@ function checkDatesValidity($date)
 {
     $isValid = false;
     $d = DateTime::createFromFormat('Y-m-d H:i', $date);
-    if (($d && $d->format('Y-m-d H:i') == $date) OR empty($date)) {
+    if (($d && $d->format('Y-m-d H:i') === $date) OR empty($date)) {
         $isValid = true;
     }
     return $isValid;
@@ -191,6 +191,12 @@ function addNewUser($link, $email, $password, $name)
     return $res;
 }
 
+
+/**
+ * @param $link
+ * @param $usersId
+ * @return string
+ */
 function getUsersNameById($link, $usersId)
 {
     $sql = "SELECT name FROM users WHERE id = ?";
@@ -198,7 +204,7 @@ function getUsersNameById($link, $usersId)
     mysqli_stmt_bind_param($stmt, "s", $usersId);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    return mysqli_fetch_assoc($result);
+    return mysqli_fetch_assoc($result)["name"] ?? "";
 }
 
 function addNewProject($link, $usersId, $projectName)
@@ -208,7 +214,7 @@ function addNewProject($link, $usersId, $projectName)
     mysqli_stmt_bind_param($stmt, 'is', $usersId, $projectName);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    if (mysqli_num_rows($result) == 0) {
+    if (mysqli_num_rows($result) === 0) {
         $sql = "INSERT INTO projects (title, users_id) VALUES (?, ?)";
         $stmt = mysqli_prepare($link, $sql);
         mysqli_stmt_bind_param($stmt, "si", $projectName, $usersId);
@@ -224,7 +230,7 @@ function addNewTask($link, $postedName, $fileUrl, $postedProject, $postedDate, $
     mysqli_stmt_bind_param($stmt, "ssisi", $postedName, $fileUrl, $postedProject, $postedDate, $usersId);
     $res = mysqli_stmt_execute($stmt);
     if ($res) {
-        if ($postedProject == NULL) {
+        if ($postedProject === NULL) {
             header("Location: " . "index.php");
         } else {
             header("Location: " . "index.php?id=" . $postedProject);
@@ -234,7 +240,7 @@ function addNewTask($link, $postedName, $fileUrl, $postedProject, $postedDate, $
 
 function checkTaskAsDone($link, $taskId)
 {
-    $sql = "UPDATE tasks SET doneDate = NOW() WHERE id = ?";
+    $sql = "UPDATE tasks SET doneDate = IF (doneDate IS NULL, NOW(), NULL) WHERE id = ?";
     $stmt = mysqli_prepare($link, $sql);
     mysqli_stmt_bind_param($stmt, 'i', $taskId);
     mysqli_stmt_execute($stmt);
